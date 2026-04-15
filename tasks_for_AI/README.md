@@ -27,16 +27,15 @@ tasks_for_AI/
 
 ## Estados del ciclo SDD
 
-Cada carpeta avanza por estos estados:
+Cada carpeta avanza por estos estados (alineados con los del roadmap maestro):
 
 | Estado | Archivos presentes | Responsable activo |
 |---|---|---|
-| 🟡 Refinando | `01-user-story.md` | Claude + Tú |
-| 🟠 Contract en revisión | `+ 02-contract.md` | Claude + Tú (aprobación) |
-| 🔵 Spec lista para ejecutar | `+ 03-spec.md` | Codex (ejecuta) |
-| 🟢 En implementación | `+ branch asociada` | Codex (marca `[x]`) |
-| ✅ Feature lista para PR | tests verdes + spec completa | Claude (revisa) |
-| 🚀 Publicada | merge a main | Vercel (deploy) |
+| ⬜ Pendiente | (no existe carpeta) | Director (decide arrancar) |
+| 🟡 Contract en revisión | `01-user-story.md` | Planner + Director (aprobación) |
+| 🟠 Spec en ejecución | `+ 02-contract.md`, `+ 03-spec.md` | Codex (implementa) |
+| 🟢 En PR | los 3 archivos + rama con PR abierto | Planner (revisa), Director (merge) |
+| ✅ Publicado | Execution Report completo al final del spec | — (historial) |
 
 ## Reglas
 
@@ -48,4 +47,4 @@ Cada carpeta avanza por estos estados:
 
 ## Índice de funcionalidades
 
-El índice vivo se mantiene en [`../docs/manual-ejecucion.md`](../docs/manual-ejecucion.md) (se generará al arrancar la Fase 1).
+El índice vivo se mantiene en [`../docs/roadmap.md`](../docs/roadmap.md), desglosado por fase en los archivos `../docs/roadmap-fase-{0,1,2,3}.md`.
