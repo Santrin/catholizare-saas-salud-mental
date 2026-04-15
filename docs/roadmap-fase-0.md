@@ -23,9 +23,9 @@ Fase 0 se cierra (estado global ✅) cuando:
 
 | ID | Nombre | Depende de | Tipo | Estado | Carpeta SDD |
 |---|---|---|---|---|---|
-| P0-001 | Proyecto base Next.js + Supabase + Vercel | — | setup | ✅ | — (hecho en commit `85fb706`, antes del primer ciclo SDD) |
-| P0-002 | Ramas protegidas en GitHub + CODEOWNERS | P0-001 | setup | ⬜ | (pendiente) |
-| P0-003 | Ambientes dev / staging / prod (Supabase + Vercel) | P0-001 | setup | ⬜ | (pendiente) |
+| P0-001 | Scaffolding local Next.js + Supabase SDK + docs base | — | setup | ✅ | — (hecho en commit `85fb706`, antes del primer ciclo SDD) |
+| P0-002 | Ramas protegidas en GitHub + CODEOWNERS | P0-001 | setup | 🟡 | (en refinamiento) |
+| P0-003 | Ambientes dev / staging / prod (Supabase Cloud + Vercel hosting) | P0-001 | setup | ⬜ | (pendiente) |
 | P0-004 | Supabase Auth + Google OAuth (profesional y paciente) | P0-003 | feature | ⬜ | (pendiente) |
 | P0-005 | Modelo de datos inicial + RLS + audit_log | P0-003 | feature | ⬜ | (pendiente) |
 | P0-006 | Shell visual (layouts globales, navegación, login/logout) | P0-004, P0-005 | feature | ⬜ | (pendiente) |
@@ -36,15 +36,22 @@ Fase 0 se cierra (estado global ✅) cuando:
 
 Estas notas son **esqueleto** para arrancar `close-requirement`, no son User Stories cerradas. Cada item abre su entrevista trade-off cuando el Director decida arrancarlo.
 
-### P0-001 — Proyecto base (✅ hecho)
+### P0-001 — Scaffolding local (✅ hecho)
 
-Commit `85fb706` creó la base del proyecto:
+Commit `85fb706` creó el **scaffolding local** del proyecto:
 - Next.js 15 + React 19 + TypeScript 5.6 + Tailwind CSS 3.
-- Supabase SSR (clientes client, server, admin separados).
-- Middleware de sesión.
+- Supabase SSR: **solo el SDK y los clientes** (client, server, admin) — no hay proyectos Supabase Cloud conectados todavía.
+- Middleware de sesión (referencia local, no valida contra Supabase real aún).
 - Validación de env con Zod (`src/lib/env.ts`).
 - `.env.example`, PR template, docs base.
 - Symlinks `.claude/`, `.codex/`, `.cursor/` → `ai-specs/`.
+- `supabase/config.toml` listo para `supabase start` local con Docker.
+
+**Lo que NO cubre P0-001 y pasa a P0-003:**
+- Proyectos reales en Supabase Cloud (dev, staging, prod).
+- Cuenta y hosting en Vercel con el repo conectado.
+- Dominio `os.catholizare.com` apuntando vía CNAME.
+- Variables de entorno configuradas en Vercel dashboard.
 
 Sin Contract formal por ser scaffolding previo al primer ciclo SDD.
 
