@@ -151,10 +151,9 @@ pnpm supabase gen types         # Regenerar tipos TypeScript
 ### Deploy
 
 ```bash
-# Automático al hacer push a main (via Vercel + GitHub Action)
-# Manual:
-pnpm deploy:staging             # Deploy a entorno de staging
-pnpm deploy:production          # Deploy a producción (requiere aprobación)
+# Automático al hacer push a main (via Railway + GitHub integration)
+# Railway detecta pushes a main y despliega automáticamente.
+# Para ambientes, configurar environments en Railway dashboard.
 ```
 
 ---

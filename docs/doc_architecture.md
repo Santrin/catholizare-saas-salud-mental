@@ -42,7 +42,7 @@ Para comandos de verificación concretos, consulta [`docs/doc_verification_guide
 | Videollamadas | Zoom Server-to-Server OAuth (Fase 2) |
 | Pagos | Stripe (ya en uso en Care y Pro) |
 | Facturación CFDI MX | Facturapi (Fase 2) |
-| Hosting frontend | Vercel |
+| Hosting frontend | Railway |
 | Repositorio | GitHub |
 
 ---

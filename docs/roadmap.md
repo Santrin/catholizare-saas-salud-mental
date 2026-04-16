@@ -41,7 +41,7 @@ Cada fila con ID (ej. `P0-004`, `F1-006`) sigue este ciclo:
 4. **Spec (🟠)** — el Planner escribe el Implementation Spec con checkboxes `[ ] T<fase>.<índice>` y comandos de validación. Se entrega a Codex.
 5. **Ejecución** — Codex crea rama, implementa, marca checkboxes, llena el Execution Report al final del spec.
 6. **PR (🟢)** — Codex abre PR desde su rama. El Planner revisa contra el Contract aprobado (sin drift). Itera si hace falta.
-7. **Publicado (✅)** — el Director hace merge a `main`. Vercel despliega automáticamente.
+7. **Publicado (✅)** — el Director hace merge a `main`. Railway despliega automáticamente.
 
 Referencias detalladas:
 - Flujo del Planner: [doc_ai_planning_mode.md](doc_ai_planning_mode.md)
@@ -80,7 +80,7 @@ Cada fase se considera **cerrada** cuando todos sus items están ✅ y se cumple
 
 Items que no impiden el inicio de Fase 0/1 pero deben documentarse antes de Fase 2:
 
-- Configuración del dominio `os.catholizare.com` vía CNAME en Hostinger apuntando a Vercel.
+- Configuración del dominio `os.catholizare.com` vía CNAME en Hostinger apuntando a Railway.
 - Decisión final sobre proveedor de CFDI (Facturapi es el default del architecture doc).
 - Política de retención de backups de Supabase (mínimo NOM-024: 5 años para expediente clínico).
 - Definición de SLA de respuesta de Resend para emails transaccionales críticos (recordatorios de sesión).

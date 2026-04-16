@@ -27,7 +27,7 @@ Cumplimiento obligatorio: **NOM-004-SSA3-2012** y **NOM-024-SSA3-2012**.
 - **Supabase** (PostgreSQL + Auth + Storage + RLS)
 - **Resend** (email transaccional)
 - **Stripe** (lectura de eventos en Fase 1, cobros en Fase 2)
-- **Hosting:** Vercel (frontend + API routes), Supabase Cloud (DB + Auth)
+- **Hosting:** Railway (frontend + API routes), Supabase Cloud (DB + Auth)
 
 Detalle arquitectónico: [`docs/doc_architecture.md`](docs/doc_architecture.md)
 
@@ -63,7 +63,7 @@ Documentación:
 ## Estructura del repositorio
 
 ```
-├── .claude/ .codex/ .cursor/    # Symlinks a ai-specs/ (multi-copilot)
+├── .claude/ .codex/              # Symlinks a ai-specs/ (multi-copilot)
 ├── ai-specs/                     # Canonical: agentes, skills, commands
 ├── tasks_for_AI/                 # Contracts y specs por funcionalidad
 ├── docs/                         # Arquitectura, planning mode, verificación
@@ -98,7 +98,7 @@ Documentación:
 - Node.js 20 LTS o superior
 - pnpm 9 (o npm)
 - Docker Desktop (para Supabase local)
-- Cuenta en [Supabase](https://supabase.com) y [Vercel](https://vercel.com) (solo para staging/prod)
+- Cuenta en [Supabase](https://supabase.com) y [Railway](https://railway.app) (solo para staging/prod)
 
 ### Primera vez
 

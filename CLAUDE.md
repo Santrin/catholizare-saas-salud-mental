@@ -116,7 +116,6 @@ Cada Contract que toque datos del paciente debe declarar:
 catholizare-saas-salud-mental/
 ├── .claude/                    # symlink a ai-specs (para Claude Code)
 ├── .codex/                     # symlink a ai-specs (para Codex)
-├── .cursor/                    # symlink a ai-specs (para Cursor)
 ├── ai-specs/                   # CANONICAL: agentes, skills, commands
 │   ├── .agents/
 │   ├── .commands/

@@ -11,7 +11,7 @@
 Fase 0 se cierra (estado global ✅) cuando:
 
 1. Repositorio con ramas protegidas en GitHub, CODEOWNERS configurado, CI bloquea merge a `main` si falla.
-2. Ambientes **dev / staging / prod** separados en Supabase y Vercel, con variables de entorno distintas.
+2. Ambientes **dev / staging / prod** separados en Supabase y Railway, con variables de entorno distintas.
 3. Login con Google funcional en los 3 ambientes (paciente y profesional).
 4. Modelo de datos inicial con RLS por tenant, `audit_log` activo, migraciones versionadas.
 5. Shell visual (layouts, navegación, login/logout, estado vacío) deployada en **staging** y revisable.
@@ -25,7 +25,7 @@ Fase 0 se cierra (estado global ✅) cuando:
 |---|---|---|---|---|---|
 | P0-001 | Scaffolding local Next.js + Supabase SDK + docs base | — | setup | ✅ | — (hecho en commit `85fb706`, antes del primer ciclo SDD) |
 | P0-002 | Ramas protegidas en GitHub + CODEOWNERS | P0-001 | setup | 🟡 | (en refinamiento) |
-| P0-003 | Ambientes dev / staging / prod (Supabase Cloud + Vercel hosting) | P0-001 | setup | ⬜ | (pendiente) |
+| P0-003 | Ambientes dev / staging / prod (Supabase Cloud + Railway hosting) | P0-001 | setup | ⬜ | (pendiente) |
 | P0-004 | Supabase Auth + Google OAuth (profesional y paciente) | P0-003 | feature | ⬜ | (pendiente) |
 | P0-005 | Modelo de datos inicial + RLS + audit_log | P0-003 | feature | ⬜ | (pendiente) |
 | P0-006 | Shell visual (layouts globales, navegación, login/logout) | P0-004, P0-005 | feature | ⬜ | (pendiente) |
@@ -44,14 +44,14 @@ Commit `85fb706` creó el **scaffolding local** del proyecto:
 - Middleware de sesión (referencia local, no valida contra Supabase real aún).
 - Validación de env con Zod (`src/lib/env.ts`).
 - `.env.example`, PR template, docs base.
-- Symlinks `.claude/`, `.codex/`, `.cursor/` → `ai-specs/`.
+- Symlinks `.claude/`, `.codex/` → `ai-specs/`.
 - `supabase/config.toml` listo para `supabase start` local con Docker.
 
 **Lo que NO cubre P0-001 y pasa a P0-003:**
 - Proyectos reales en Supabase Cloud (dev, staging, prod).
-- Cuenta y hosting en Vercel con el repo conectado.
+- Cuenta y hosting en Railway con el repo conectado.
 - Dominio `os.catholizare.com` apuntando vía CNAME.
-- Variables de entorno configuradas en Vercel dashboard.
+- Variables de entorno configuradas en Railway dashboard.
 
 Sin Contract formal por ser scaffolding previo al primer ciclo SDD.
 
@@ -69,9 +69,9 @@ Temas a cerrar con `close-requirement`:
 
 Temas a cerrar:
 - 3 proyectos Supabase independientes (`catholizare-os-dev`, `-staging`, `-prod`) vs 1 proyecto con schemas separados. El default del architecture doc es **3 proyectos** por aislamiento real.
-- Vercel: 3 environments (Development, Preview=Staging, Production) con variables distintas.
+- Railway: 3 environments (Development, Staging, Production) con variables distintas.
 - ¿Quién tiene acceso admin a prod? (solo Director; Planner y Implementing Agent sin acceso a prod).
-- Política de secretos: Vercel env vars + Supabase dashboard. Nunca en repo.
+- Política de secretos: Railway env vars + Supabase dashboard. Nunca en repo.
 - Backups: frecuencia y retención (NOM-024 exige mínimo 5 años para expediente; backups automáticos de Supabase con retención adicional).
 
 ### P0-004 — Supabase Auth + Google OAuth
