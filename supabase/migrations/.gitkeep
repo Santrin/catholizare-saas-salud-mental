@@ -1,0 +1,9 @@
+# Aquí viven las migraciones SQL versionadas de Supabase.
+# Formato: <timestamp>_<descripcion-corta>.sql
+# Ejemplo: 20260415000000_initial_schema.sql
+#
+# REGLAS:
+# 1. Nunca editar una migración ya committeada; crear una nueva.
+# 2. Toda tabla clínica debe incluir RLS explícito en la misma migración.
+# 3. Toda tabla clínica debe tener audit_log trigger si aplica.
+# 4. Probar localmente con `pnpm supabase:reset` antes de commit.
