@@ -3,9 +3,10 @@ import type { ProBanner } from "@/lib/pro/types";
 
 type ProBannerListProps = {
   banners: ProBanner[];
+  compact?: boolean;
 };
 
-export function ProBannerList({ banners }: ProBannerListProps) {
+export function ProBannerList({ banners, compact = false }: ProBannerListProps) {
   if (banners.length === 0) {
     return null;
   }
@@ -16,7 +17,7 @@ export function ProBannerList({ banners }: ProBannerListProps) {
         <p className="text-xs font-bold uppercase tracking-wider text-azulMedio">Actualizaciones</p>
         <h2 className="mt-1 text-xl font-bold text-principal">Anuncios para ti</h2>
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className={compact ? "grid gap-3" : "grid gap-4 lg:grid-cols-2"}>
       {banners.map((banner) => (
         <article
           key={banner.id}
@@ -27,15 +28,17 @@ export function ProBannerList({ banners }: ProBannerListProps) {
             <img
               src={banner.image_url}
               alt=""
-              className="h-40 w-full object-cover"
+              className={compact ? "h-28 w-full object-cover" : "h-40 w-full object-cover"}
               loading="lazy"
             />
           ) : (
             <div className="h-2 bg-enfasis" />
           )}
-          <div className="p-5 sm:p-6">
+          <div className={compact ? "p-4" : "p-5 sm:p-6"}>
             <p className="text-xs font-bold uppercase tracking-wider text-azulMedio">Catholizare Pro</p>
-            <h3 className="mt-2 text-lg font-bold text-principal">{banner.title}</h3>
+            <h3 className={compact ? "mt-2 text-base font-bold text-principal" : "mt-2 text-lg font-bold text-principal"}>
+              {banner.title}
+            </h3>
             <p className="mt-2 text-sm leading-6 text-principal/65">{banner.body}</p>
               {banner.cta_url ? (
                 <a

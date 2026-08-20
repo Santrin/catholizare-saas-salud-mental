@@ -38,7 +38,9 @@ export default async function ProfessionalProcesosPage() {
           </div>
         </div>
 
-        <StartProcessSelectorForm expedientes={expedientes} />
+        <section id="conceptualizar-caso" className="scroll-mt-24">
+          <StartProcessSelectorForm expedientes={expedientes} />
+        </section>
         <ProcessesTable procesos={procesos} />
       </div>
     </main>

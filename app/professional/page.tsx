@@ -2,7 +2,8 @@ import Link from "next/link";
 
 import { ProfessionalMembershipPanel } from "@/components/professional/professional-membership-panel";
 import { ProBannerList } from "@/components/pro/pro-banner-list";
-import { ProEventsList } from "@/components/pro/pro-events-list";
+import { ProfessionalActivityHighlights } from "@/components/pro/professional-activity-highlights";
+import { RotatingProResource } from "@/components/pro/rotating-pro-resource";
 import { requireRole } from "@/lib/auth/profile";
 import { getProfessionalProDashboard } from "@/lib/pro/queries";
 
@@ -12,24 +13,14 @@ export default async function ProfessionalPage() {
   const firstName = profile.full_name.trim().split(" ")[0] || profile.full_name;
   const menuLinks = [
     {
-      label: "Pacientes",
-      href: "/professional/patients",
-      description: "Consulta y administra las personas a tu cargo."
-    },
-    {
-      label: "Expedientes",
-      href: "/professional/expedientes",
-      description: "Continua el registro clinico de cada proceso."
-    },
-    {
-      label: "Notas clinicas",
-      href: "/professional/notas",
-      description: "Revisa borradores y notas confirmadas."
-    },
-    {
       label: "Agenda",
       href: "/professional/agenda",
       description: "Organiza tus proximas citas y videollamadas."
+    },
+    {
+      label: "Conceptualizar tu caso",
+      href: "/professional/procesos#conceptualizar-caso",
+      description: "Selecciona un paciente y abre su proceso para completar la conceptualizacion."
     }
   ];
 
@@ -57,32 +48,43 @@ export default async function ProfessionalPage() {
           </div>
         </section>
 
-        <section>
-          <p className="text-xs font-bold uppercase tracking-wider text-azulMedio">Accesos frecuentes</p>
-          <h2 className="mt-1 text-xl font-bold text-principal">Que necesitas hacer?</h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {menuLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group flex min-h-[166px] flex-col border border-principal/10 bg-blanco p-5 transition hover:border-azulMedio"
-              >
-                <span className="mb-4 h-1 w-10 bg-enfasis" />
-                <span className="font-bold text-principal">{item.label}</span>
-                <span className="mt-2 flex-1 text-sm leading-5 text-principal/60">
-                  {item.description}
-                </span>
-                <span className="mt-4 text-sm font-bold text-azulMedio transition group-hover:text-secundario">
-                  Abrir seccion
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-start">
+          <div className="space-y-8">
+            <section>
+              <p className="text-xs font-bold uppercase tracking-wider text-azulMedio">Accesos frecuentes</p>
+              <h2 className="mt-1 text-xl font-bold text-principal">Que necesitas hacer?</h2>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {menuLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group flex min-h-[150px] flex-col border border-principal/10 bg-blanco p-5 transition hover:border-azulMedio"
+                  >
+                    <span className="mb-4 h-1 w-10 bg-enfasis" />
+                    <span className="font-bold text-principal">{item.label}</span>
+                    <span className="mt-2 flex-1 text-sm leading-5 text-principal/60">
+                      {item.description}
+                    </span>
+                    <span className="mt-4 text-sm font-bold text-azulMedio transition group-hover:text-secundario">
+                      Abrir seccion
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
 
-        <ProBannerList banners={pro.banners} />
-        <ProEventsList events={pro.events} />
-        <ProfessionalMembershipPanel />
+            <RotatingProResource
+              resources={pro.resources}
+              initialBucket={Math.floor(Date.now() / 600_000)}
+            />
+            <ProfessionalActivityHighlights events={pro.events} />
+            <ProfessionalMembershipPanel />
+          </div>
+
+          <aside className="lg:sticky lg:top-24">
+            <ProBannerList banners={pro.banners} compact />
+          </aside>
+        </div>
       </div>
     </main>
   );
