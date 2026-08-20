@@ -8,6 +8,7 @@ import { generateClinicalDraft } from "@/lib/ai/openai";
 import type { ClinicalContextPackage } from "@/lib/ai/types";
 import { safeWriteAuditLog } from "@/lib/audit/safe";
 import { getCurrentProfile } from "@/lib/auth/profile";
+import { consentRequiredMessage, getConsentAccessPolicy } from "@/lib/consent/access-policy";
 import {
   ASSESSMENT_INPUT_METHODS,
   PATIENT_ASSESSMENT_UPLOAD_LABEL,
@@ -200,6 +201,22 @@ export async function createAssessmentAction(
     });
 
     return { message: "Solo puedes registrar evaluaciones en expedientes activos propios.", ok: false };
+  }
+
+  const consentPolicy = await getConsentAccessPolicy(expediente.id);
+
+  if (!consentPolicy?.canAdvanceClinicalWork) {
+    await safeWriteAuditLog({
+      userId: actor.id,
+      role: actor.role,
+      action: "assessment_create",
+      entityType: "psychological_assessments",
+      entityId: expediente.id,
+      result: "denied",
+      metadata: { reason: "consent_grace_session_used" },
+      context: "audit_assessment_create_denied_consent"
+    });
+    return { message: consentRequiredMessage(), ok: false };
   }
 
   const supabaseAdmin = createSupabaseAdminClient();

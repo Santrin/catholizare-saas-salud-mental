@@ -25,6 +25,7 @@ const navigationGroups = [
         label: "Anuncios pacientes",
         hint: "Contenido del portal"
       },
+      { href: "/admin/support", label: "Centros de atencion", hint: "Pacientes y profesionales" },
       { href: "/admin/help", label: "Centro de ayuda", hint: "Articulos y tickets" }
     ]
   }

@@ -29,6 +29,7 @@ const navigationGroups = [
     links: [
       { href: "/super-admin/pro", label: "Anuncios profesionales" },
       { href: "/super-admin/patient-announcements", label: "Anuncios pacientes" },
+      { href: "/super-admin/support", label: "Centros de atencion" },
       { href: "/super-admin/help", label: "Centro de ayuda" }
     ]
   }

@@ -102,6 +102,7 @@ export type PortalConsentStatus = {
   title: string;
   version: string;
   signed_at: string | null;
+  grace_session_used: boolean;
   professional: {
     full_name: string;
     email: string;

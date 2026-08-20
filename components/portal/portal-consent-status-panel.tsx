@@ -38,9 +38,11 @@ export function PortalConsentStatusPanel({ statuses }: PortalConsentStatusPanelP
                 Firmado el {new Date(status.signed_at).toLocaleString("es-MX")}.
               </p>
             ) : (
-              <p className="mt-2 text-xs text-ink/55">
-                Aun esta pendiente. Si aparece el formulario de firma, completalo para continuar.
-              </p>
+              <div className="mt-3 rounded-md border border-rojoRompe/25 bg-rojoRompe/5 p-3 text-xs leading-5 text-principal/75">
+                {status.grace_session_used
+                  ? "La sesion inicial de gracia ya fue utilizada. Firma el consentimiento para que puedan programarse nuevas sesiones y continuar el registro clinico."
+                  : "Aun esta pendiente. Puedes tener una primera sesion de gracia; completa la firma cuanto antes para evitar que el proceso se bloquee despues de esa sesion."}
+              </div>
             )}
           </article>
         ))}

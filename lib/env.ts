@@ -29,6 +29,7 @@ const serverEnvSchema = publicEnvSchema.extend({
   INTEGRATION_TOKEN_ENCRYPTION_KEY: optionalStringEnv,
   RESEND_API_KEY: optionalStringEnv,
   RESEND_FROM_EMAIL: optionalStringEnv,
+  CONSENT_REMINDER_CRON_SECRET: optionalStringEnv,
   CATHOLIZARE_LEGAL_EMAIL: z.string().email().default("catholizare@gmail.com")
 });
 
@@ -58,6 +59,7 @@ export function getServerEnv() {
     INTEGRATION_TOKEN_ENCRYPTION_KEY: process.env.INTEGRATION_TOKEN_ENCRYPTION_KEY,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
+    CONSENT_REMINDER_CRON_SECRET: process.env.CONSENT_REMINDER_CRON_SECRET,
     CATHOLIZARE_LEGAL_EMAIL: process.env.CATHOLIZARE_LEGAL_EMAIL
   });
 }

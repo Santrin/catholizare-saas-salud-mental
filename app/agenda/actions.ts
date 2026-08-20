@@ -7,6 +7,7 @@ import { z } from "zod";
 import { getCurrentProfile } from "@/lib/auth/profile";
 import { safeWriteAuditLog } from "@/lib/audit/safe";
 import { APPOINTMENT_TYPES } from "@/lib/agenda/types";
+import { consentRequiredMessage, getConsentAccessPolicy } from "@/lib/consent/access-policy";
 import {
   syncAppointmentCancelledToGoogleCalendar,
   syncAppointmentCreatedToGoogleCalendar
@@ -46,7 +47,7 @@ async function assertActiveExpedienteForPatient(patientId: string, professionalI
   const supabaseAdmin = createSupabaseAdminClient();
   const { data, error } = await supabaseAdmin
     .from("expedientes")
-    .select("id, patient_id, professional_id, status")
+    .select("id, patient_id, professional_id, status, consent_status")
     .eq("patient_id", patientId)
     .eq("professional_id", professionalId)
     .eq("status", "activo")
@@ -61,6 +62,7 @@ async function assertActiveExpedienteForPatient(patientId: string, professionalI
     patient_id: string;
     professional_id: string;
     status: string;
+    consent_status: string;
   };
 }
 
@@ -182,6 +184,24 @@ export async function createAppointmentAction(
     });
 
     return { message: "Solo puedes agendar pacientes con expediente activo.", ok: false };
+  }
+
+  const consentPolicy = await getConsentAccessPolicy(expediente.id);
+
+  if (!consentPolicy?.canScheduleAppointment) {
+    await safeWriteAuditLog({
+      userId: actor.id,
+      role: actor.role,
+      action: "appointment_create",
+      entityType: "citas",
+      result: "denied",
+      metadata: {
+        patient_id: expediente.patient_id,
+        reason: "consent_grace_session_used"
+      },
+      context: "audit_appointment_create_denied_consent"
+    });
+    return { message: consentRequiredMessage(), ok: false };
   }
 
   const supabaseAdmin = createSupabaseAdminClient();

@@ -6,6 +6,7 @@ import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 
 import { getCurrentProfile } from "@/lib/auth/profile";
+import { consentRequiredMessage, getConsentAccessPolicy } from "@/lib/consent/access-policy";
 import { safeWriteAuditLog } from "@/lib/audit/safe";
 import {
   DEFAULT_NOTA_TEMPLATE_SECTIONS,
@@ -46,11 +47,6 @@ type NotaAccess = {
   } | null;
 };
 
-const allowedConsentStatuses = new Set([
-  "firmado_fisico",
-  "firmado_digital",
-  "excepcion_justificada"
-]);
 const allowedMoodReviewValues = new Set(["-5", "-3", "0", "3", "5"]);
 
 const optionalScore = z.preprocess(
@@ -490,7 +486,9 @@ export async function createNotaClinicaAction(
     return { message: "El expediente no esta activo y no puede modificarse.", ok: false };
   }
 
-  if (!allowedConsentStatuses.has(expediente.consent_status)) {
+  const consentPolicy = await getConsentAccessPolicy(expediente.id);
+
+  if (!consentPolicy?.canCreateClinicalNote) {
     await safeWriteAuditLog({
       userId: actor.id,
       role: actor.role,
@@ -499,12 +497,13 @@ export async function createNotaClinicaAction(
       entityId: expediente.id,
       result: "denied",
       metadata: {
-        consent_status: expediente.consent_status
+        consent_status: expediente.consent_status,
+        reason: "consent_grace_session_used"
       },
       context: "audit_nota_clinica_create_denied_consent"
     });
 
-    return { message: "El expediente requiere consentimiento informado firmado.", ok: false };
+    return { message: consentRequiredMessage(), ok: false };
   }
 
   let template: Pick<NotaTemplate, "id" | "version" | "sections">;

@@ -14,6 +14,8 @@ import { PortalProcessResourcesPanel } from "@/components/portal/portal-process-
 import { PortalAppointmentsTabs } from "@/components/portal/portal-appointments-tabs";
 import { PortalCustomerSupportPanel } from "@/components/portal/portal-customer-support-panel";
 import { PortalResourceRecommendationsPanel } from "@/components/portal/portal-resource-recommendations-panel";
+import { SupportConversationPanel } from "@/components/support/support-conversation-panel";
+import { getParticipantSupportConversation } from "@/lib/support/queries";
 
 function lifeHistoryStatusText(status?: string | null) {
   if (status === "enviada") {
@@ -33,7 +35,10 @@ function lifeHistoryStatusText(status?: string | null) {
 
 export default async function PortalPage() {
   const profile = await requireRole(["paciente"]);
-  const dashboard = await getPortalDashboard(profile);
+  const [dashboard, supportConversation] = await Promise.all([
+    getPortalDashboard(profile),
+    getParticipantSupportConversation(profile)
+  ]);
 
   return (
     <main className="min-h-[calc(100vh-72px)] px-4 py-6 sm:px-6 sm:py-8">
@@ -145,7 +150,12 @@ export default async function PortalPage() {
               label: "Atencion al cliente",
               description: "Encuentra ayuda para resolver dudas sobre tu cuenta o el portal.",
               group: "apoyo",
-              content: <PortalCustomerSupportPanel />
+              content: (
+                <div className="space-y-6">
+                  <SupportConversationPanel conversation={supportConversation} audienceLabel="paciente" />
+                  <PortalCustomerSupportPanel />
+                </div>
+              )
             },
             {
               id: "solicitudes",

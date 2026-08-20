@@ -5,6 +5,8 @@ import { SupportTicketForm } from "@/components/help/support-ticket-form";
 import { SupportTicketList } from "@/components/help/support-ticket-list";
 import { requireRole } from "@/lib/auth/profile";
 import { getProfessionalHelpDashboard } from "@/lib/help/queries";
+import { SupportConversationPanel } from "@/components/support/support-conversation-panel";
+import { getParticipantSupportConversation } from "@/lib/support/queries";
 
 const faqItems = [
   {
@@ -24,7 +26,10 @@ const faqItems = [
 
 export default async function ProfessionalHelpPage() {
   const profile = await requireRole(["profesional"]);
-  const help = await getProfessionalHelpDashboard(profile);
+  const [help, supportConversation] = await Promise.all([
+    getProfessionalHelpDashboard(profile),
+    getParticipantSupportConversation(profile)
+  ]);
 
   return (
     <main className="px-4 py-6 sm:px-6 sm:py-8 xl:px-10">
@@ -56,6 +61,8 @@ export default async function ProfessionalHelpPage() {
           <h2 className="text-lg font-bold text-principal">Guias y articulos</h2>
           <HelpArticleList articles={help.articles} />
         </section>
+
+        <SupportConversationPanel conversation={supportConversation} audienceLabel="profesional" />
 
         <section className="grid gap-4 md:grid-cols-3">
           {faqItems.map((item) => (

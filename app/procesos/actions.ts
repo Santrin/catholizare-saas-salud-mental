@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { getCurrentProfile } from "@/lib/auth/profile";
 import { safeWriteAuditLog } from "@/lib/audit/safe";
+import { consentRequiredMessage, getConsentAccessPolicy } from "@/lib/consent/access-policy";
 import {
   PROCESS_FIELD_TYPES,
   PROCESS_MODEL_TYPES,
@@ -540,6 +541,22 @@ export async function updateProcesoStepAction(
     });
 
     return { message: "Los procesos cerrados son de solo lectura.", ok: false };
+  }
+
+  const consentPolicy = await getConsentAccessPolicy(process.expediente_id);
+
+  if (!consentPolicy?.canAdvanceClinicalWork) {
+    await safeWriteAuditLog({
+      userId: actor.id,
+      role: actor.role,
+      action: "proceso_step_update",
+      entityType: "procesos_terapeuticos",
+      entityId: process.id,
+      result: "denied",
+      metadata: { reason: "consent_grace_session_used" },
+      context: "audit_proceso_step_update_denied_consent"
+    });
+    return { message: consentRequiredMessage(), ok: false };
   }
 
   const step = process.template_snapshot.steps.find((item) => item.id === parsed.data.stepId);

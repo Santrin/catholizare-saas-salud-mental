@@ -434,9 +434,23 @@ async function getPortalConsentStatuses(
     }
   }
 
-  const professionals = await getProfilesById([
-    ...new Set(expedientes.map((expediente) => expediente.professional_id))
+  const [professionals, { data: graceNotes, error: graceNotesError }] = await Promise.all([
+    getProfilesById([...new Set(expedientes.map((expediente) => expediente.professional_id))]),
+    supabaseAdmin
+      .from("notas_clinicas")
+      .select("expediente_id")
+      .in("expediente_id", expedienteIds)
+      .neq("note_type", "addendum")
+      .neq("status", "anulada_logicamente")
   ]);
+
+  if (graceNotesError) {
+    throw new Error(`Unable to load portal consent grace status: ${graceNotesError.message}`);
+  }
+
+  const graceUsedExpedienteIds = new Set(
+    (graceNotes ?? []).map((note) => note.expediente_id as string)
+  );
   const professionalByExpediente = new Map(
     expedientes.map((expediente) => [expediente.id, expediente.professional_id])
   );
@@ -450,6 +464,7 @@ async function getPortalConsentStatuses(
       title: (row.standard_document_title as string | null) ?? STANDARD_CONSENT_TITLE,
       version: (row.standard_document_version as string | null) ?? STANDARD_CONSENT_VERSION,
       signed_at: row.signed_at as string | null,
+      grace_session_used: graceUsedExpedienteIds.has(row.expediente_id as string),
       professional: professionals.get(professionalId) ?? {
         full_name: "Profesional no disponible",
         email: ""
