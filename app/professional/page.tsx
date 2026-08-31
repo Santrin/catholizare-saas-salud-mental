@@ -1,15 +1,20 @@
 import Link from "next/link";
 
 import { ProfessionalMembershipPanel } from "@/components/professional/professional-membership-panel";
+import { ProfessionalDashboardMetricsPanel } from "@/components/professional/professional-dashboard-metrics";
 import { ProBannerList } from "@/components/pro/pro-banner-list";
 import { ProfessionalActivityHighlights } from "@/components/pro/professional-activity-highlights";
 import { RotatingProResource } from "@/components/pro/rotating-pro-resource";
 import { requireRole } from "@/lib/auth/profile";
+import { getProfessionalDashboardMetrics } from "@/lib/professional/dashboard";
 import { getProfessionalProDashboard } from "@/lib/pro/queries";
 
 export default async function ProfessionalPage() {
   const profile = await requireRole(["profesional"]);
-  const pro = await getProfessionalProDashboard(profile, "dashboard");
+  const [pro, metrics] = await Promise.all([
+    getProfessionalProDashboard(profile, "dashboard"),
+    getProfessionalDashboardMetrics(profile)
+  ]);
   const firstName = profile.full_name.trim().split(" ")[0] || profile.full_name;
   const menuLinks = [
     {
@@ -47,6 +52,8 @@ export default async function ProfessionalPage() {
             </div>
           </div>
         </section>
+
+        <ProfessionalDashboardMetricsPanel metrics={metrics} />
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-start">
           <div className="space-y-8">

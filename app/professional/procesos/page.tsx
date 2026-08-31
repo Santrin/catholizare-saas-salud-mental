@@ -5,7 +5,8 @@ import {
   getExpedientesForProcessStart,
   getProcesosForProfessional
 } from "@/lib/procesos/queries";
-import { ProcessesTable } from "@/components/procesos/processes-table";
+import { ActionDialog } from "@/components/ui/action-dialog";
+import { ProcessPatientsTable } from "@/components/procesos/process-patients-table";
 import { StartProcessSelectorForm } from "@/components/procesos/start-process-selector-form";
 
 export default async function ProfessionalProcesosPage() {
@@ -29,6 +30,9 @@ export default async function ProfessionalProcesosPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
+            <ActionDialog buttonLabel="Asignar proceso terapeutico" title="Asignar proceso terapeutico">
+              <StartProcessSelectorForm expedientes={expedientes} embedded />
+            </ActionDialog>
             <Link href="/professional/procesos/template" className="text-sm font-medium text-azulMedio">
               Editar plantillas
             </Link>
@@ -38,10 +42,15 @@ export default async function ProfessionalProcesosPage() {
           </div>
         </div>
 
-        <section id="conceptualizar-caso" className="scroll-mt-24">
-          <StartProcessSelectorForm expedientes={expedientes} />
+        <section id="conceptualizar-caso" className="scroll-mt-24 space-y-4">
+          <div>
+            <h2 className="text-xl font-bold text-principal">Pacientes y procesos terapeuticos</h2>
+            <p className="mt-1 text-sm text-principal/60">
+              Abre la conceptualizacion de un caso o asigna un proceso nuevo desde el boton superior.
+            </p>
+          </div>
+          <ProcessPatientsTable expedientes={expedientes} procesos={procesos} />
         </section>
-        <ProcessesTable procesos={procesos} />
       </div>
     </main>
   );

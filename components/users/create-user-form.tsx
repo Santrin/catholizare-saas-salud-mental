@@ -13,12 +13,14 @@ type CreateUserFormProps = {
   allowedRoles: UserRole[];
   professionals?: UserManagementProfile[];
   fixedRole?: UserRole;
+  embedded?: boolean;
 };
 
 export function CreateUserForm({
   allowedRoles,
   professionals = [],
-  fixedRole
+  fixedRole,
+  embedded = false
 }: CreateUserFormProps) {
   const [state, formAction] = useActionState(createManagedUserAction, {});
   const roleOptions = fixedRole ? [fixedRole] : allowedRoles;
@@ -26,7 +28,10 @@ export function CreateUserForm({
   const showPrimaryProfessional = selectedRole === "paciente" && professionals.length > 0;
 
   return (
-    <form action={formAction} className="space-y-4 rounded-lg border border-ink/10 bg-white p-5">
+    <form
+      action={formAction}
+      className={embedded ? "space-y-4" : "space-y-4 rounded-lg border border-ink/10 bg-white p-5"}
+    >
       <div>
         <h2 className="text-lg font-semibold text-ink">Crear usuario</h2>
         <p className="mt-1 text-sm text-ink/65">Se enviará una invitación por correo.</p>

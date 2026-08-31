@@ -16,14 +16,21 @@ type StartProcessSelectorFormProps = {
       email: string;
     };
   }>;
+  embedded?: boolean;
 };
 
-export function StartProcessSelectorForm({ expedientes }: StartProcessSelectorFormProps) {
+export function StartProcessSelectorForm({
+  expedientes,
+  embedded = false
+}: StartProcessSelectorFormProps) {
   const [state, formAction] = useActionState(startGeneralProcessAction, {});
   const activeExpedientes = expedientes.filter((expediente) => expediente.status === "activo");
 
   return (
-    <form action={formAction} className="space-y-4 rounded-lg border border-ink/10 bg-white p-5">
+    <form
+      action={formAction}
+      className={embedded ? "space-y-4" : "space-y-4 rounded-lg border border-ink/10 bg-white p-5"}
+    >
       <div>
         <h2 className="text-lg font-semibold text-ink">Iniciar proceso</h2>
         <p className="mt-1 text-sm text-ink/65">

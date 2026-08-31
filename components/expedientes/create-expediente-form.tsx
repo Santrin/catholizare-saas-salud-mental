@@ -10,13 +10,17 @@ import type { UserManagementProfile } from "@/lib/users/types";
 
 type CreateExpedienteFormProps = {
   patients: UserManagementProfile[];
+  embedded?: boolean;
 };
 
-export function CreateExpedienteForm({ patients }: CreateExpedienteFormProps) {
+export function CreateExpedienteForm({ patients, embedded = false }: CreateExpedienteFormProps) {
   const [state, formAction] = useActionState(createExpedienteAction, {});
 
   return (
-    <form action={formAction} className="space-y-4 rounded-lg border border-ink/10 bg-white p-5">
+    <form
+      action={formAction}
+      className={embedded ? "space-y-4" : "space-y-4 rounded-lg border border-ink/10 bg-white p-5"}
+    >
       <div>
         <h2 className="text-lg font-semibold text-ink">Crear expediente clinico</h2>
         <p className="mt-1 text-sm text-ink/65">

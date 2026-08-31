@@ -5,6 +5,7 @@ import { getExpedientesForProfessional } from "@/lib/expedientes/queries";
 import { getPatientsForProfessional } from "@/lib/users/queries";
 import { CreateUserForm } from "@/components/users/create-user-form";
 import { UsersTable } from "@/components/users/users-table";
+import { ActionDialog } from "@/components/ui/action-dialog";
 
 export default async function ProfessionalPatientsPage() {
   const profile = await requireRole(["profesional"]);
@@ -31,9 +32,14 @@ export default async function ProfessionalPatientsPage() {
             </p>
             <h1 className="mt-1 text-2xl font-bold text-principal sm:text-3xl">Pacientes</h1>
           </div>
-          <Link href="/professional" className="text-sm font-medium text-azulMedio">
-            Volver al panel
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <ActionDialog buttonLabel="Crear nuevo paciente" title="Crear nuevo paciente">
+              <CreateUserForm allowedRoles={["paciente"]} fixedRole="paciente" embedded />
+            </ActionDialog>
+            <Link href="/professional" className="text-sm font-medium text-azulMedio">
+              Volver al panel
+            </Link>
+          </div>
         </div>
 
         <Link
@@ -43,7 +49,12 @@ export default async function ProfessionalPatientsPage() {
           Abrir expedientes clinicos
         </Link>
 
-        <CreateUserForm allowedRoles={["paciente"]} fixedRole="paciente" />
+        <div>
+          <h2 className="text-xl font-bold text-principal">Lista de pacientes</h2>
+          <p className="mt-1 text-sm text-principal/60">
+            Consulta las cuentas asignadas y abre su expediente cuando ya este disponible.
+          </p>
+        </div>
         <UsersTable users={patients} expedienteLinksByUserId={expedienteLinksByUserId} />
       </div>
     </main>
