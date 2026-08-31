@@ -36,6 +36,12 @@ export type ProfessionalDashboardMetrics = {
   }>;
   activePatients: DashboardPatient[];
   inactivePatients: Array<DashboardPatient & { lastActivityAt: string }>;
+  reconceptualizationAlerts: Array<{
+    processId: string;
+    patient: DashboardPatient;
+    sessionsSinceLastReview: number;
+    interval: number;
+  }>;
 };
 
 function mexicoCityMonthBounds(now = new Date()) {
@@ -76,7 +82,9 @@ export async function getProfessionalDashboardMetrics(
     { data: upcoming, error: upcomingError, count: upcomingCount },
     { data: recentNotes, error: notesError },
     { data: monthlyAppointments, error: monthlyError },
-    { data: appointmentHistory, error: historyError }
+    { data: appointmentHistory, error: historyError },
+    { data: activeProcesses, error: processesError },
+    { data: processNotes, error: processNotesError }
   ] = await Promise.all([
     supabaseAdmin
       .from("professional_dashboard_settings")
@@ -114,11 +122,31 @@ export async function getProfessionalDashboardMetrics(
       .select("patient_id, scheduled_at")
       .eq("professional_id", profile.id)
       .neq("status", "cancelada")
-      .order("scheduled_at", { ascending: false })
+      .order("scheduled_at", { ascending: false }),
+    supabaseAdmin
+      .from("procesos_terapeuticos")
+      .select("id, patient_id, reconceptualization_interval, last_reconceptualized_session_count")
+      .eq("professional_id", profile.id)
+      .eq("status", "activo")
+      .not("reconceptualization_interval", "is", null),
+    supabaseAdmin
+      .from("notas_clinicas")
+      .select("process_id")
+      .eq("professional_id", profile.id)
+      .in("status", ["confirmada", "con_addendum", "exportada"])
+      .neq("note_type", "addendum")
+      .not("process_id", "is", null)
   ]);
 
   const queryError =
-    settingsError ?? expedientesError ?? upcomingError ?? notesError ?? monthlyError ?? historyError;
+    settingsError ??
+    expedientesError ??
+    upcomingError ??
+    notesError ??
+    monthlyError ??
+    historyError ??
+    processesError ??
+    processNotesError;
 
   if (queryError) {
     await safeWriteAuditLog({
@@ -203,6 +231,30 @@ export async function getProfessionalDashboardMetrics(
     (appointment) => appointment.status === "cancelada"
   ).length;
   const sessionPriceCents = Number(settings?.session_price_cents ?? 0);
+  const sessionsByProcess = new Map<string, number>();
+  for (const note of processNotes ?? []) {
+    const processId = note.process_id as string;
+    sessionsByProcess.set(processId, (sessionsByProcess.get(processId) ?? 0) + 1);
+  }
+  const reconceptualizationAlerts = (activeProcesses ?? []).flatMap((process) => {
+    const interval = Number(process.reconceptualization_interval ?? 0);
+    const sessionsSinceLastReview = Math.max(
+      0,
+      (sessionsByProcess.get(process.id as string) ?? 0) -
+        Number(process.last_reconceptualized_session_count ?? 0)
+    );
+
+    if (!interval || sessionsSinceLastReview < interval) {
+      return [];
+    }
+
+    return [{
+      processId: process.id as string,
+      patient: patientFor(process.patient_id as string),
+      sessionsSinceLastReview,
+      interval
+    }];
+  });
 
   await safeWriteAuditLog({
     userId: profile.id,
@@ -214,7 +266,8 @@ export async function getProfessionalDashboardMetrics(
       active_patients_count: activePatients.length,
       upcoming_appointments_count: upcomingCount ?? 0,
       inactive_patients_count: inactivePatients.length,
-      month_completed_sessions_count: completedSessionsThisMonth
+      month_completed_sessions_count: completedSessionsThisMonth,
+      reconceptualization_alerts_count: reconceptualizationAlerts.length
     },
     context: "audit_professional_dashboard_read_success"
   });
@@ -241,6 +294,7 @@ export async function getProfessionalDashboardMetrics(
       patient: patientFor(note.patient_id as string)
     })),
     activePatients,
-    inactivePatients
+    inactivePatients,
+    reconceptualizationAlerts
   };
 }

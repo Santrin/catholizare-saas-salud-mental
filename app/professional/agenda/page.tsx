@@ -6,6 +6,7 @@ import { AppointmentStatsPanel } from "@/components/agenda/appointment-stats";
 import { GoogleCalendarPanel } from "@/components/agenda/google-calendar-panel";
 import { PatientAppointmentFilter } from "@/components/agenda/patient-appointment-filter";
 import { WeeklyAgenda } from "@/components/agenda/weekly-agenda";
+import { ActionDialog } from "@/components/ui/action-dialog";
 import { requireRole } from "@/lib/auth/profile";
 import {
   getAgendaPatientOptions,
@@ -26,7 +27,6 @@ export default async function ProfessionalAgendaPage({ searchParams }: Professio
   const profile = await requireRole(["profesional"]);
   const params = await searchParams;
   const selectedPatientId = firstParam(params.patientId);
-  const view = firstParam(params.view) === "create" ? "create" : "calendar";
   const [appointments, patients, stats, googleConnection] = await Promise.all([
     getAppointmentsForProfessional(profile, selectedPatientId),
     getAgendaPatientOptions(profile),
@@ -48,37 +48,20 @@ export default async function ProfessionalAgendaPage({ searchParams }: Professio
               expediente activo.
             </p>
           </div>
-          <Link href="/professional" className="text-sm font-medium text-azulMedio">
-            Volver al panel
-          </Link>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/professional/agenda?view=calendar"
-            className={`rounded-md px-4 py-2 text-sm font-semibold ${
-              view === "calendar" ? "bg-azulMedio text-white" : "border border-azulMedio text-azulMedio"
-            }`}
-          >
-            Agenda
-          </Link>
-          <Link
-            href="/professional/agenda?view=create#agregar-cita"
-            className={`rounded-md px-4 py-2 text-sm font-semibold ${
-              view === "create" ? "bg-azulMedio text-white" : "border border-azulMedio text-azulMedio"
-            }`}
-          >
-            Agregar citas
-          </Link>
-        </div>
-
-        {view === "create" ? (
-          <div id="agregar-cita">
-            <CreateAppointmentForm patients={patients} />
+          <div className="flex flex-wrap items-center gap-3">
+            <ActionDialog buttonLabel="Crear cita" title="Programar una nueva cita">
+              <CreateAppointmentForm patients={patients} embedded />
+            </ActionDialog>
+            <Link
+              href="/professional"
+              className="inline-flex min-h-10 items-center rounded-md bg-principal px-4 text-sm font-bold text-blanco transition hover:bg-secundario"
+            >
+              Volver al panel
+            </Link>
           </div>
-        ) : (
-          <WeeklyAgenda appointments={appointments} />
-        )}
+        </div>
+
+        <WeeklyAgenda appointments={appointments} />
         <GoogleCalendarPanel connection={googleConnection} />
 
         <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">

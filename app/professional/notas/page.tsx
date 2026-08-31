@@ -84,11 +84,11 @@ export default async function ProfessionalNotasPage({
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href="/professional" className="text-sm font-medium text-azulMedio">
+            <Link href="/professional" className="inline-flex min-h-10 items-center rounded-md border border-azulMedio bg-blanco px-4 text-sm font-bold text-azulMedio">
               Volver al panel
             </Link>
-            <Link href="/professional/notas/template" className="text-sm font-medium text-azulMedio">
-              Notas clinicas
+            <Link href="/professional/notas/template" className="inline-flex min-h-10 items-center rounded-md bg-principal px-4 text-sm font-bold text-blanco">
+              Plantillas de notas clinicas
             </Link>
           </div>
         </div>

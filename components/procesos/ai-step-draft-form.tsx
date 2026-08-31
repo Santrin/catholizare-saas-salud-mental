@@ -10,9 +10,15 @@ type AiStepDraftFormProps = {
   processId: string;
   stepId: string;
   disabled: boolean;
+  disabledReason?: string;
 };
 
-export function AiStepDraftForm({ processId, stepId, disabled }: AiStepDraftFormProps) {
+export function AiStepDraftForm({
+  processId,
+  stepId,
+  disabled,
+  disabledReason
+}: AiStepDraftFormProps) {
   const [state, formAction] = useActionState(requestStepAiDraftAction, {});
 
   return (
@@ -25,6 +31,9 @@ export function AiStepDraftForm({ processId, stepId, disabled }: AiStepDraftForm
         <p className="mt-1 text-xs text-ink/60">
           La sugerencia no se guarda automaticamente. Revisala y copia solo lo que decidas usar.
         </p>
+        {disabledReason ? (
+          <p className="mt-2 text-xs font-semibold text-principal/65">{disabledReason}</p>
+        ) : null}
       </div>
 
       <label className="block">

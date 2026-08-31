@@ -2,9 +2,11 @@ import type { ProResource } from "@/lib/pro/types";
 
 type ProResourcesListProps = {
   resources: ProResource[];
+  newResourceIds?: string[];
 };
 
-export function ProResourcesList({ resources }: ProResourcesListProps) {
+export function ProResourcesList({ resources, newResourceIds = [] }: ProResourcesListProps) {
+  const newIds = new Set(newResourceIds);
   return (
     <section>
       <p className="text-xs font-bold uppercase tracking-wider text-azulMedio">Biblioteca</p>
@@ -33,6 +35,9 @@ export function ProResourcesList({ resources }: ProResourcesListProps) {
                 <span className="rounded-md bg-enfasis/20 px-2 py-1 text-xs font-semibold text-principal">
                   Destacado
                 </span>
+              ) : null}
+              {newIds.has(resource.id) ? (
+                <span className="rounded-md bg-rojoRompe px-2 py-1 text-xs font-bold text-blanco">Nuevo</span>
               ) : null}
             </div>
             <p className="mt-2 text-sm leading-6 text-ink/65">{resource.description}</p>

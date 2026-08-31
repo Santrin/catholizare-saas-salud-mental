@@ -2,9 +2,11 @@ import type { ProEvent } from "@/lib/pro/types";
 
 type ProEventsListProps = {
   events: ProEvent[];
+  newEventIds?: string[];
 };
 
-export function ProEventsList({ events }: ProEventsListProps) {
+export function ProEventsList({ events, newEventIds = [] }: ProEventsListProps) {
+  const newIds = new Set(newEventIds);
   return (
     <section>
       <p className="text-xs font-bold uppercase tracking-wider text-azulMedio">Agenda Catholizare</p>
@@ -21,6 +23,9 @@ export function ProEventsList({ events }: ProEventsListProps) {
               {event.event_type}
             </p>
             <h3 className="mt-2 font-bold text-principal">{event.title}</h3>
+            {newIds.has(event.id) ? (
+              <span className="mt-2 inline-flex rounded-md bg-rojoRompe px-2 py-1 text-xs font-bold text-blanco">Nuevo</span>
+            ) : null}
             <p className="mt-1 text-sm text-ink/65">
               {new Date(event.starts_at).toLocaleString("es-MX")} - {event.modality}
             </p>

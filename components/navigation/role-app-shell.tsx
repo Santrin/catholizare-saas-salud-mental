@@ -10,6 +10,7 @@ export type RoleNavigationGroup = {
     href: string;
     label: string;
     hint?: string;
+    badgeCount?: number;
   }>;
 };
 
@@ -76,7 +77,7 @@ function RoleNavigation({
                   onClick={onNavigate}
                   aria-current={active ? "page" : undefined}
                   className={[
-                    "block min-h-11 border-l-4 px-3 py-2 transition",
+                    "relative block min-h-11 border-l-4 px-3 py-2 pr-10 transition",
                     active
                       ? "border-azulMedio bg-grisMuyClaro text-principal"
                       : "border-transparent text-principal/70 hover:bg-grisMuyClaro hover:text-principal"
@@ -86,6 +87,11 @@ function RoleNavigation({
                   {link.hint ? (
                     <span className="mt-0.5 block text-[11px] leading-4 text-grisTextos">
                       {link.hint}
+                    </span>
+                  ) : null}
+                  {!active && link.badgeCount && link.badgeCount > 0 ? (
+                    <span className="absolute right-2 top-2 inline-flex min-w-5 items-center justify-center rounded-full bg-rojoRompe px-1.5 py-0.5 text-[10px] font-bold text-blanco">
+                      {link.badgeCount > 99 ? "99+" : link.badgeCount}
                     </span>
                   ) : null}
                 </Link>

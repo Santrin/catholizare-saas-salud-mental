@@ -1,3 +1,9 @@
+import {
+  PROCESS_MODEL_LABEL,
+  PROCESS_MODEL_TYPES,
+  type ProcessModelType
+} from "@/lib/procesos/types";
+
 export const NOTA_CLINICA_TYPES = [
   "sesion",
   "interconsulta",
@@ -14,13 +20,9 @@ export type NotaClinicaType =
   | (typeof NOTA_CLINICA_TYPES)[number]
   | (typeof LEGACY_NOTA_CLINICA_TYPES)[number];
 
-export const NOTA_TEMPLATE_MODEL_TYPES = ["general", "tcc"] as const;
-export type NotaTemplateModelType = (typeof NOTA_TEMPLATE_MODEL_TYPES)[number];
-
-export const NOTA_TEMPLATE_MODEL_LABEL: Record<NotaTemplateModelType, string> = {
-  general: "General",
-  tcc: "TCC"
-};
+export const NOTA_TEMPLATE_MODEL_TYPES = PROCESS_MODEL_TYPES;
+export type NotaTemplateModelType = ProcessModelType;
+export const NOTA_TEMPLATE_MODEL_LABEL: Record<NotaTemplateModelType, string> = PROCESS_MODEL_LABEL;
 
 export const NOTA_TEMPLATE_FIELD_TYPES = [
   "text",
@@ -57,6 +59,8 @@ export type NotaTemplate = {
   sections: NotaTemplateSection[];
   created_by_user_id: string | null;
   created_at: string;
+  archived_at: string | null;
+  archived_by_user_id: string | null;
 };
 
 export const NOTA_CLINICA_STATUSES = [

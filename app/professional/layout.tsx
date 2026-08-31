@@ -1,7 +1,9 @@
 import { RoleAppShell } from "@/components/navigation/role-app-shell";
 import { requireRole } from "@/lib/auth/profile";
+import { getProfessionalResourceNotificationCount } from "@/lib/pro/notifications";
 
-const navigationGroups = [
+function navigationGroups(resourceNotificationCount: number) {
+  return [
   {
     label: "Atencion clinica",
     links: [
@@ -24,12 +26,13 @@ const navigationGroups = [
   {
     label: "Apoyo",
     links: [
-      { href: "/professional/resources", label: "Recursos" },
+      { href: "/professional/resources", label: "Recursos", badgeCount: resourceNotificationCount },
       { href: "/professional/help", label: "Centro de ayuda" },
       { href: "/professional/export", label: "Solicitar exportacion" }
     ]
   }
-];
+  ];
+}
 
 export default async function ProfessionalLayout({
   children
@@ -37,13 +40,14 @@ export default async function ProfessionalLayout({
   children: React.ReactNode;
 }>) {
   const profile = await requireRole(["profesional"]);
+  const resourceNotificationCount = await getProfessionalResourceNotificationCount(profile);
 
   return (
     <RoleAppShell
       homeHref="/professional"
       roleLabel="Espacio profesional"
       fullName={profile.full_name}
-      navigationGroups={navigationGroups}
+      navigationGroups={navigationGroups(resourceNotificationCount)}
     >
       {children}
     </RoleAppShell>

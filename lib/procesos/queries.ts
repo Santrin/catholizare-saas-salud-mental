@@ -14,7 +14,7 @@ import type {
 } from "@/lib/procesos/types";
 
 const PROCESO_SELECT =
-  "id, expediente_id, patient_id, professional_id, model_type, template_id, template_version, template_snapshot, status, started_at, closed_at, closed_by_note_id, step_data, gpt_instructions, linked_note_ids, linked_assessment_ids, created_by_user_id, created_at, updated_at";
+  "id, expediente_id, patient_id, professional_id, model_type, template_id, template_version, template_snapshot, status, started_at, closed_at, closed_by_note_id, step_data, gpt_instructions, linked_note_ids, linked_assessment_ids, created_by_user_id, created_at, updated_at, reconceptualization_interval, last_reconceptualized_session_count, ai_conceptualization_enabled, ai_next_block_plan_enabled";
 
 const TEMPLATE_SELECT =
   "id, professional_id, model_type, version, steps, created_by_user_id, created_at";
@@ -223,4 +223,35 @@ export async function getProcesoDetail(profile: AuthProfile, processId: string) 
       email: ""
     }
   } satisfies ProcesoDetail;
+}
+
+export async function getUsedProcessModelTypes(profile: AuthProfile) {
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { data, error } = await supabaseAdmin
+    .from("procesos_terapeuticos")
+    .select("model_type")
+    .eq("professional_id", profile.id);
+
+  if (error) {
+    throw new Error(`Unable to load used process model types: ${error.message}`);
+  }
+
+  return [...new Set((data ?? []).map((row) => row.model_type as ProcessModelType))];
+}
+
+export async function getProcessConfirmedSessionCount(profile: AuthProfile, processId: string) {
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { count, error } = await supabaseAdmin
+    .from("notas_clinicas")
+    .select("id", { count: "exact", head: true })
+    .eq("professional_id", profile.id)
+    .eq("process_id", processId)
+    .in("status", ["confirmada", "con_addendum", "exportada"])
+    .neq("note_type", "addendum");
+
+  if (error) {
+    throw new Error(`Unable to load process confirmed session count: ${error.message}`);
+  }
+
+  return count ?? 0;
 }

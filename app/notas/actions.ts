@@ -126,6 +126,11 @@ const templateSchema = z.object({
   sectionsJson: z.string().trim().min(2)
 });
 
+const templateManagementSchema = z.object({
+  templateId: z.string().uuid(),
+  name: z.string().trim().min(1).max(120).optional()
+});
+
 const noteIdSchema = z.object({
   noteId: z.string().uuid()
 });
@@ -403,6 +408,7 @@ async function getOrCreateLatestNotaTemplate(
     .select("id, version, sections")
     .eq("professional_id", professionalId)
     .eq("model_type", modelType)
+    .is("archived_at", null)
     .order("version", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -645,14 +651,29 @@ export async function saveNotaTemplateAction(
   }
 
   const supabaseAdmin = createSupabaseAdminClient();
-  const { data: latestTemplate } = await supabaseAdmin
+  const [{ data: latestTemplate }, { count: activeVersionCount }] = await Promise.all([
+    supabaseAdmin
     .from("plantillas_nota_clinica")
     .select("version")
     .eq("professional_id", actor.id)
     .eq("model_type", parsed.data.modelType)
     .order("version", { ascending: false })
     .limit(1)
-    .maybeSingle();
+    .maybeSingle(),
+    supabaseAdmin
+      .from("plantillas_nota_clinica")
+      .select("id", { count: "exact", head: true })
+      .eq("professional_id", actor.id)
+      .eq("model_type", parsed.data.modelType)
+      .is("archived_at", null)
+  ]);
+
+  if ((activeVersionCount ?? 0) >= 3) {
+    return {
+      message: "Ya tienes 3 versiones activas. Archiva una version antes de crear otra.",
+      ok: false
+    };
+  }
 
   const nextVersion = Number(latestTemplate?.version ?? 0) + 1;
   const { error } = await supabaseAdmin.from("plantillas_nota_clinica").insert({
@@ -713,6 +734,81 @@ export async function saveNotaTemplateAction(
   revalidatePath("/professional/notas");
 
   return { message: `Plantilla version ${nextVersion} guardada.`, ok: true };
+}
+
+export async function archiveNotaTemplateAction(formData: FormData) {
+  const actor = await getActiveProfessional();
+  const parsed = templateManagementSchema.safeParse({ templateId: formData.get("templateId") });
+
+  if (!actor || !parsed.success) {
+    return;
+  }
+
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { data, error } = await supabaseAdmin
+    .from("plantillas_nota_clinica")
+    .update({ archived_at: new Date().toISOString(), archived_by_user_id: actor.id })
+    .eq("id", parsed.data.templateId)
+    .eq("professional_id", actor.id)
+    .is("archived_at", null)
+    .select("id, model_type, version")
+    .single();
+
+  if (error || !data) {
+    Sentry.captureException(error ?? new Error("Note template archive affected no rows"));
+    return;
+  }
+
+  await safeWriteAuditLog({
+    userId: actor.id,
+    role: actor.role,
+    action: "nota_template_archive",
+    entityType: "plantillas_nota_clinica",
+    entityId: data.id,
+    result: "success",
+    metadata: { model_type: data.model_type, version: data.version },
+    context: "audit_nota_template_archive_success"
+  });
+  revalidatePath("/professional/notas/template");
+}
+
+export async function renameNotaTemplateAction(formData: FormData) {
+  const actor = await getActiveProfessional();
+  const parsed = templateManagementSchema.safeParse({
+    templateId: formData.get("templateId"),
+    name: formData.get("name")
+  });
+
+  if (!actor || !parsed.success || !parsed.data.name) {
+    return;
+  }
+
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { data, error } = await supabaseAdmin
+    .from("plantillas_nota_clinica")
+    .update({ name: parsed.data.name })
+    .eq("id", parsed.data.templateId)
+    .eq("professional_id", actor.id)
+    .is("archived_at", null)
+    .select("id, model_type, version")
+    .single();
+
+  if (error || !data) {
+    Sentry.captureException(error ?? new Error("Note template rename affected no rows"));
+    return;
+  }
+
+  await safeWriteAuditLog({
+    userId: actor.id,
+    role: actor.role,
+    action: "nota_template_rename",
+    entityType: "plantillas_nota_clinica",
+    entityId: data.id,
+    result: "success",
+    metadata: { model_type: data.model_type, version: data.version },
+    context: "audit_nota_template_rename_success"
+  });
+  revalidatePath("/professional/notas/template");
 }
 
 export async function updateDraftNotaClinicaAction(

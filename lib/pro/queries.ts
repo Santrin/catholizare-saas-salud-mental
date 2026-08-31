@@ -57,7 +57,8 @@ function resolveAnnouncementImage<T extends { image_url: string | null; image_st
 
 export async function getProfessionalProDashboard(
   profile: AuthProfile,
-  section = "dashboard"
+  section = "dashboard",
+  auditRead = true
 ): Promise<ProfessionalProDashboard> {
   const supabaseAdmin = createSupabaseAdminClient();
   const [
@@ -91,17 +92,19 @@ export async function getProfessionalProDashboard(
   ]);
 
   if (resourcesError || bannersError || eventsError) {
-    await safeWriteAuditLog({
-      userId: profile.id,
-      role: profile.role,
-      action: "pro_content_read",
-      entityType: "pro_content",
-      result: "error",
-      metadata: {
-        section
-      },
-      context: "audit_pro_content_read_error"
-    });
+    if (auditRead) {
+      await safeWriteAuditLog({
+        userId: profile.id,
+        role: profile.role,
+        action: "pro_content_read",
+        entityType: "pro_content",
+        result: "error",
+        metadata: {
+          section
+        },
+        context: "audit_pro_content_read_error"
+      });
+    }
 
     throw new Error("Unable to load Catholizare Pro content.");
   }
@@ -129,19 +132,21 @@ export async function getProfessionalProDashboard(
     ...((events ?? []) as ProEvent[]).map((event) => resolveAnnouncementImage(supabaseAdmin, event))
   ].slice(0, 8);
 
-  await safeWriteAuditLog({
-    userId: profile.id,
-    role: profile.role,
-    action: "pro_content_read",
-    entityType: "pro_content",
-    result: "success",
-    metadata: {
-      section,
-      resources_count: mergedResources.length,
-      banners_count: visibleBanners.length
-    },
-    context: "audit_pro_content_read_success"
-  });
+  if (auditRead) {
+    await safeWriteAuditLog({
+      userId: profile.id,
+      role: profile.role,
+      action: "pro_content_read",
+      entityType: "pro_content",
+      result: "success",
+      metadata: {
+        section,
+        resources_count: mergedResources.length,
+        banners_count: visibleBanners.length
+      },
+      context: "audit_pro_content_read_success"
+    });
+  }
 
   return {
     resources: mergedResources,

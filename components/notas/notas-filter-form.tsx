@@ -17,7 +17,7 @@ const noteTypeLabels: Record<(typeof NOTA_CLINICA_TYPES)[number], string> = {
 
 export function NotasFilterForm({ filters, patients, view = "drafts" }: NotasFilterFormProps) {
   return (
-    <form className="grid gap-4 rounded-lg border border-ink/10 bg-white p-5 md:grid-cols-3">
+    <form className="grid gap-3 rounded-lg border border-ink/10 bg-white p-4 sm:grid-cols-2 xl:grid-cols-[minmax(10rem,1.2fr)_8rem_8rem_8rem_minmax(8rem,1fr)_auto] xl:items-end">
       <input type="hidden" name="view" value={view} />
 
       <SearchablePersonSelect
@@ -69,7 +69,7 @@ export function NotasFilterForm({ filters, patients, view = "drafts" }: NotasFil
         />
       </label>
 
-      <label className="block md:col-span-2">
+      <label className="block">
         <span className="text-sm font-medium text-ink">Texto</span>
         <input
           name="query"
@@ -78,7 +78,7 @@ export function NotasFilterForm({ filters, patients, view = "drafts" }: NotasFil
         />
       </label>
 
-      <div className="md:col-span-3">
+      <div>
         <button
           type="submit"
           className="inline-flex h-11 items-center justify-center rounded-md bg-azulMedio px-5 text-sm font-semibold text-white transition hover:bg-ink"

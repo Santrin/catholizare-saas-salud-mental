@@ -111,6 +111,17 @@ const closeProcessSchema = z.object({
   closureNoteId: z.string().uuid()
 });
 
+const reconceptualizationSettingsSchema = z.object({
+  processId: z.string().uuid(),
+  interval: z.enum(["none", "4", "8", "10", "12"]),
+  aiConceptualization: z.boolean(),
+  aiNextBlockPlan: z.boolean()
+});
+
+const reconceptualizationCompleteSchema = z.object({
+  processId: z.string().uuid()
+});
+
 async function getActiveProfessional() {
   const profile = await getCurrentProfile();
 
@@ -491,6 +502,118 @@ export async function startProcessAction(
 }
 
 export const startGeneralProcessAction = startProcessAction;
+
+export async function updateReconceptualizationSettingsAction(
+  _previousState: ProcesoActionState,
+  formData: FormData
+): Promise<ProcesoActionState> {
+  const actor = await getActiveProfessional();
+  const parsed = reconceptualizationSettingsSchema.safeParse({
+    processId: formData.get("processId"),
+    interval: formData.get("interval"),
+    aiConceptualization: formData.get("aiConceptualization") === "on",
+    aiNextBlockPlan: formData.get("aiNextBlockPlan") === "on"
+  });
+
+  if (!actor || !parsed.success) {
+    return { message: "Configuracion de reconceptualizacion invalida.", ok: false };
+  }
+
+  const process = await assertProcessOwner(parsed.data.processId, actor.id);
+  if (!process || process.status !== "activo") {
+    return { message: "El proceso no esta activo o no te pertenece.", ok: false };
+  }
+
+  const interval = parsed.data.interval === "none" ? null : Number(parsed.data.interval);
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { error } = await supabaseAdmin
+    .from("procesos_terapeuticos")
+    .update({
+      reconceptualization_interval: interval,
+      ai_conceptualization_enabled: parsed.data.aiConceptualization,
+      ai_next_block_plan_enabled: parsed.data.aiNextBlockPlan
+    })
+    .eq("id", process.id)
+    .eq("professional_id", actor.id)
+    .eq("status", "activo");
+
+  if (error) {
+    Sentry.captureException(error, { extra: { process_id: process.id } });
+    return { message: "No fue posible guardar la configuracion.", ok: false };
+  }
+
+  await safeWriteAuditLog({
+    userId: actor.id,
+    role: actor.role,
+    action: "proceso_reconceptualization_settings_update",
+    entityType: "procesos_terapeuticos",
+    entityId: process.id,
+    result: "success",
+    metadata: {
+      interval,
+      ai_conceptualization_enabled: parsed.data.aiConceptualization,
+      ai_next_block_plan_enabled: parsed.data.aiNextBlockPlan
+    },
+    context: "audit_proceso_reconceptualization_settings_success"
+  });
+  revalidatePath(`/professional/procesos/${process.id}`);
+  revalidatePath("/professional");
+  return { message: "Configuracion actualizada.", ok: true };
+}
+
+export async function markProcessReconceptualizedAction(formData: FormData) {
+  const actor = await getActiveProfessional();
+  const parsed = reconceptualizationCompleteSchema.safeParse({ processId: formData.get("processId") });
+
+  if (!actor || !parsed.success) {
+    return;
+  }
+
+  const process = await assertProcessOwner(parsed.data.processId, actor.id);
+  if (!process || process.status !== "activo") {
+    return;
+  }
+
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { count, error: countError } = await supabaseAdmin
+    .from("notas_clinicas")
+    .select("id", { count: "exact", head: true })
+    .eq("professional_id", actor.id)
+    .eq("process_id", process.id)
+    .in("status", ["confirmada", "con_addendum", "exportada"])
+    .neq("note_type", "addendum");
+
+  if (countError) {
+    Sentry.captureException(countError, { extra: { process_id: process.id } });
+    return;
+  }
+
+  const sessionCount = count ?? 0;
+  const { error } = await supabaseAdmin
+    .from("procesos_terapeuticos")
+    .update({ last_reconceptualized_session_count: sessionCount })
+    .eq("id", process.id)
+    .eq("professional_id", actor.id)
+    .eq("status", "activo");
+
+  if (error) {
+    Sentry.captureException(error, { extra: { process_id: process.id } });
+    return;
+  }
+
+  await safeWriteAuditLog({
+    userId: actor.id,
+    role: actor.role,
+    action: "proceso_reconceptualization_complete",
+    entityType: "procesos_terapeuticos",
+    entityId: process.id,
+    result: "success",
+    metadata: { confirmed_session_count: sessionCount },
+    context: "audit_proceso_reconceptualization_complete_success"
+  });
+  revalidatePath(`/professional/procesos/${process.id}`);
+  revalidatePath("/professional");
+}
 
 export async function updateProcesoStepAction(
   _previousState: ProcesoActionState,

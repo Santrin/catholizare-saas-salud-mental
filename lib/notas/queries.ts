@@ -21,7 +21,7 @@ const NOTA_SUMMARY_SELECT =
 const NOTA_METRIC_SELECT =
   "id, note_type, status, session_date, mood_review, tcc_session_number, note_template_values";
 const NOTA_TEMPLATE_SELECT =
-  "id, professional_id, model_type, name, version, sections, created_by_user_id, created_at";
+  "id, professional_id, model_type, name, version, sections, created_by_user_id, created_at, archived_at, archived_by_user_id";
 
 export async function getLatestNotaTemplate(
   profile: AuthProfile,
@@ -33,6 +33,7 @@ export async function getLatestNotaTemplate(
     .select(NOTA_TEMPLATE_SELECT)
     .eq("professional_id", profile.id)
     .eq("model_type", modelType)
+    .is("archived_at", null)
     .order("version", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -66,6 +67,7 @@ export async function getNotaTemplateVersions(
     .select(NOTA_TEMPLATE_SELECT)
     .eq("professional_id", profile.id)
     .eq("model_type", modelType)
+    .is("archived_at", null)
     .order("version", { ascending: false });
 
   if (error) {
@@ -86,6 +88,30 @@ export async function getNotaTemplateVersions(
   }
 
   return (data ?? []) as NotaTemplate[];
+}
+
+export async function getLatestNotaTemplates(profile: AuthProfile) {
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { data, error } = await supabaseAdmin
+    .from("plantillas_nota_clinica")
+    .select(NOTA_TEMPLATE_SELECT)
+    .eq("professional_id", profile.id)
+    .is("archived_at", null)
+    .order("model_type", { ascending: true })
+    .order("version", { ascending: false });
+
+  if (error) {
+    throw new Error(`Unable to load latest note templates: ${error.message}`);
+  }
+
+  const latestByModel = new Map<string, NotaTemplate>();
+  for (const template of (data ?? []) as NotaTemplate[]) {
+    if (!latestByModel.has(template.model_type)) {
+      latestByModel.set(template.model_type, template);
+    }
+  }
+
+  return latestByModel;
 }
 
 async function getPatientsById(patientIds: string[]) {

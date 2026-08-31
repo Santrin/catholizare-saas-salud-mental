@@ -30,23 +30,25 @@ export default async function NotaClinicaDetailPage({ params }: NotaClinicaDetai
               Fecha: {new Date(note.session_date).toLocaleDateString("es-MX")}
             </p>
           </div>
-          <Link
-            href={`/professional/expedientes/${note.expediente_id}`}
-            className="text-sm font-medium text-azulMedio"
-          >
-            Volver al expediente
-          </Link>
-          {canExport ? (
-            <form action={prepareNotaExportAction}>
-              <input type="hidden" name="noteId" value={note.id} />
-              <button
-                type="submit"
-                className="inline-flex h-10 items-center justify-center rounded-md bg-azulMedio px-4 text-sm font-semibold text-white transition hover:bg-ink"
-              >
-                Exportar PDF
-              </button>
-            </form>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href={`/professional/expedientes/${note.expediente_id}`}
+              className="inline-flex min-h-10 items-center rounded-md bg-principal px-4 text-sm font-bold text-blanco transition hover:bg-secundario"
+            >
+              Volver al expediente
+            </Link>
+            {canExport ? (
+              <form action={prepareNotaExportAction}>
+                <input type="hidden" name="noteId" value={note.id} />
+                <button
+                  type="submit"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-azulMedio px-4 text-sm font-semibold text-white transition hover:bg-ink"
+                >
+                  Exportar PDF
+                </button>
+              </form>
+            ) : null}
+          </div>
         </div>
 
         <NotaDetailForm note={note} />

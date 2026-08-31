@@ -182,7 +182,7 @@ export async function requestStepAiDraftAction(
 
   const process = await assertProcessOwner(parsed.data.processId, actor.id);
 
-  if (!process || process.status !== "activo") {
+  if (!process || process.status !== "activo" || !process.ai_conceptualization_enabled) {
     await safeWriteAuditLog({
       userId: actor.id,
       role: actor.role,
@@ -195,7 +195,10 @@ export async function requestStepAiDraftAction(
       context: "audit_ai_step_draft_denied_process"
     });
 
-    return { message: "No tienes permiso para usar IA en este proceso.", ok: false };
+    return {
+      message: "Activa la asistencia de IA en la configuracion de reconceptualizacion del proceso.",
+      ok: false
+    };
   }
 
   const step = process.template_snapshot.steps.find((item) => item.id === parsed.data.stepId);

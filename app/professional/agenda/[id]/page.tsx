@@ -25,7 +25,10 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
       <main className="px-4 py-6 sm:px-6 sm:py-8 xl:px-10">
         <div className="mx-auto max-w-4xl rounded-lg border border-ink/10 bg-white p-5">
           <h1 className="text-xl font-semibold text-ink">Cita no disponible</h1>
-          <Link href="/professional/agenda" className="mt-4 inline-flex text-sm font-medium text-azulMedio">
+          <Link
+            href="/professional/agenda"
+            className="mt-4 inline-flex min-h-10 items-center rounded-md bg-principal px-4 text-sm font-bold text-blanco transition hover:bg-secundario"
+          >
             Volver a agenda
           </Link>
         </div>
@@ -48,7 +51,10 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
               {appointment.patient.full_name} - {formatDate(appointment.scheduled_at)}
             </p>
           </div>
-          <Link href="/professional/agenda" className="text-sm font-medium text-azulMedio">
+          <Link
+            href="/professional/agenda"
+            className="inline-flex min-h-10 items-center rounded-md bg-principal px-4 text-sm font-bold text-blanco transition hover:bg-secundario"
+          >
             Volver a agenda
           </Link>
         </div>

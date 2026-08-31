@@ -10,6 +10,7 @@ import { APPOINTMENT_TYPES, type AgendaPatientOption, type AppointmentType } fro
 
 type CreateAppointmentFormProps = {
   patients: AgendaPatientOption[];
+  embedded?: boolean;
 };
 
 function toLocalDateInputValue(date: Date) {
@@ -20,7 +21,7 @@ function toLocalDateInputValue(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-export function CreateAppointmentForm({ patients }: CreateAppointmentFormProps) {
+export function CreateAppointmentForm({ patients, embedded = false }: CreateAppointmentFormProps) {
   const [state, formAction] = useActionState(createAppointmentAction, {});
   const [appointmentType, setAppointmentType] = useState<AppointmentType>("presencial");
   const now = new Date();
@@ -29,7 +30,10 @@ export function CreateAppointmentForm({ patients }: CreateAppointmentFormProps) 
   const timezoneOffsetMinutes = new Date().getTimezoneOffset();
 
   return (
-    <form action={formAction} className="space-y-4 rounded-lg border border-ink/10 bg-white p-5">
+    <form
+      action={formAction}
+      className={embedded ? "space-y-4" : "space-y-4 rounded-lg border border-ink/10 bg-white p-5"}
+    >
       <input type="hidden" name="timezoneOffsetMinutes" value={timezoneOffsetMinutes} />
 
       <div>

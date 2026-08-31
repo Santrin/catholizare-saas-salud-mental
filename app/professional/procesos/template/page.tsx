@@ -38,7 +38,9 @@ export default async function ProfessionalProcesoTemplatePage({
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-azulMedio">
               Enfoques terapeuticos
             </p>
-            <h1 className="mt-1 text-2xl font-bold text-principal sm:text-3xl">Plantilla de proceso</h1>
+            <h1 className="mt-1 text-2xl font-bold text-principal sm:text-3xl">
+              Plantilla de proceso terapeutico
+            </h1>
             <p className="mt-2 text-sm text-ink/65">
               Los cambios aplican solo a procesos nuevos. Cada enfoque conserva versiones propias.
             </p>

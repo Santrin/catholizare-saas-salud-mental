@@ -139,7 +139,16 @@ export function ProcessStepForm({ process, step }: ProcessStepFormProps) {
         <SubmitButton disabled={disabled}>Guardar paso</SubmitButton>
       </form>
 
-      <AiStepDraftForm processId={process.id} stepId={step.id} disabled={disabled} />
+      <AiStepDraftForm
+        processId={process.id}
+        stepId={step.id}
+        disabled={disabled || !process.ai_conceptualization_enabled}
+        disabledReason={
+          !process.ai_conceptualization_enabled
+            ? "Activa la asistencia de IA en la configuracion de reconceptualizacion para usar esta funcion."
+            : undefined
+        }
+      />
     </section>
   );
 }

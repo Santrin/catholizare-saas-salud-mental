@@ -70,6 +70,23 @@ export function ProfessionalDashboardMetricsPanel({ metrics }: ProfessionalDashb
         </article>
       </div>
 
+      {metrics.reconceptualizationAlerts.length > 0 ? (
+        <section className="mt-4 border-l-4 border-enfasis bg-enfasis/10 p-5">
+          <h3 className="font-bold text-principal">Casos que conviene reconceptualizar</h3>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {metrics.reconceptualizationAlerts.map((alert) => (
+              <Link
+                key={alert.processId}
+                href={`/professional/procesos/${alert.processId}`}
+                className="border border-enfasis bg-blanco px-3 py-2 text-sm font-semibold text-principal"
+              >
+                {alert.patient.fullName}: {alert.sessionsSinceLastReview} sesiones
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <div className="mt-4 grid gap-4 xl:grid-cols-3">
         <article className="border border-principal/10 bg-blanco p-5">
           <h3 className="font-bold text-principal">Proximas citas</h3>

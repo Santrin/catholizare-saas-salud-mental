@@ -99,6 +99,10 @@ export type ProcesoTerapeutico = {
   created_by_user_id: string | null;
   created_at: string;
   updated_at: string;
+  reconceptualization_interval: 4 | 8 | 10 | 12 | null;
+  last_reconceptualized_session_count: number;
+  ai_conceptualization_enabled: boolean;
+  ai_next_block_plan_enabled: boolean;
 };
 
 export type ProcesoListItem = Pick<
