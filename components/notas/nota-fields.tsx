@@ -9,6 +9,7 @@ type NotaFieldsProps = {
   note?: NotaClinica;
   sections?: NotaTemplateSection[];
   values?: Record<string, Record<string, string | number | boolean | null>> | null;
+  initialValues?: Record<string, string | number | boolean | null>;
   disabled?: boolean;
 };
 
@@ -65,11 +66,22 @@ function legacyValue(note: NotaClinica | undefined, fieldId: string) {
 function fieldValue(
   note: NotaClinica | undefined,
   values: NotaFieldsProps["values"],
+  initialValues: NotaFieldsProps["initialValues"],
   sectionId: string,
   fieldId: string
 ) {
   const value = values?.[sectionId]?.[fieldId];
-  return value ?? legacyValue(note, fieldId);
+  const legacy = legacyValue(note, fieldId);
+
+  if (value !== undefined && value !== null && value !== "") {
+    return value;
+  }
+
+  if (legacy !== undefined && legacy !== null && legacy !== "") {
+    return legacy;
+  }
+
+  return initialValues?.[fieldId] ?? "";
 }
 
 function FieldInput({
@@ -189,6 +201,7 @@ export function NotaFields({
   note,
   sections,
   values,
+  initialValues,
   disabled = false
 }: NotaFieldsProps) {
   const templateSections =
@@ -220,7 +233,7 @@ export function NotaFields({
                 <FieldInput
                   field={field}
                   name={`field_${section.id}_${field.id}`}
-                  value={fieldValue(note, templateValues, section.id, field.id)}
+                  value={fieldValue(note, templateValues, initialValues, section.id, field.id)}
                   disabled={disabled}
                 />
               </label>

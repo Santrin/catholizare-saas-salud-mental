@@ -9,15 +9,15 @@ function navigationGroups(resourceNotificationCount: number) {
     links: [
       { href: "/professional", label: "Inicio", hint: "Resumen de tu actividad" },
       { href: "/professional/patients", label: "Pacientes", hint: "Personas a tu cargo" },
+      { href: "/professional/agenda", label: "Agenda", hint: "Citas y calendario" },
       { href: "/professional/expedientes", label: "Expedientes", hint: "Informacion clinica" },
       { href: "/professional/notas", label: "Notas clinicas", hint: "Borradores y confirmadas" },
       { href: "/professional/procesos", label: "Procesos terapeuticos", hint: "Seguimiento de casos" }
     ]
   },
   {
-    label: "Organizacion",
+    label: "Personalizacion",
     links: [
-      { href: "/professional/agenda", label: "Agenda", hint: "Citas y calendario" },
       { href: "/professional/integrations", label: "Integraciones", hint: "Google Calendar y Zoom" },
       { href: "/professional/notas/template", label: "Plantillas de notas" },
       { href: "/professional/procesos/template", label: "Plantillas de procesos" }

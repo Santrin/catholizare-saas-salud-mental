@@ -17,6 +17,7 @@ import {
 type CreateNotaFormProps = {
   expedienteId: string;
   templates?: Partial<Record<NotaTemplateModelType, NotaTemplate | null>>;
+  initialValues?: Record<string, string | number | boolean | null>;
   disabled?: boolean;
 };
 
@@ -30,6 +31,7 @@ const noteTypeLabels: Record<(typeof NOTA_CLINICA_TYPES)[number], string> = {
 export function CreateNotaForm({
   expedienteId,
   templates = {},
+  initialValues,
   disabled = false
 }: CreateNotaFormProps) {
   const [state, formAction] = useActionState(createNotaClinicaAction, {});
@@ -83,7 +85,7 @@ export function CreateNotaForm({
         </label>
       </div>
 
-      <NotaFields sections={sections} disabled={disabled} />
+      <NotaFields sections={sections} initialValues={initialValues} disabled={disabled} />
 
       <p className="rounded-md border border-rojoRompe/30 bg-rojoRompe/10 px-3 py-2 text-sm font-semibold text-rojoRompe">
         Al guardar y confirmar la nota clinica ya no se podra modificar y en caso de requerirlo se

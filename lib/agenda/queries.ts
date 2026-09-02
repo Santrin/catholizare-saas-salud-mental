@@ -211,7 +211,21 @@ export async function getAppointmentDetail(profile: AuthProfile, appointmentId: 
   }
 
   const row = data as Omit<AppointmentListItem, "patient">;
-  const patients = await getPatientsById([row.patient_id]);
+  const [patients, expedienteResult] = await Promise.all([
+    getPatientsById([row.patient_id]),
+    supabaseAdmin
+      .from("expedientes")
+      .select("id, status, consent_status")
+      .eq("professional_id", profile.id)
+      .eq("patient_id", row.patient_id)
+      .eq("status", "activo")
+      .maybeSingle()
+  ]);
+
+  if (expedienteResult.error) {
+    throw new Error(`Unable to load appointment expediente: ${expedienteResult.error.message}`);
+  }
+
   const dateKey = localDateKey(row.scheduled_at);
   const { data: notes, error: notesError } = await supabaseAdmin
     .from("notas_clinicas")
@@ -235,6 +249,11 @@ export async function getAppointmentDetail(profile: AuthProfile, appointmentId: 
         email: ""
       }
     } satisfies AppointmentListItem,
+    expediente: expedienteResult.data as {
+      id: string;
+      status: string;
+      consent_status: string;
+    } | null,
     notes: (notes ?? []) as NotaClinicaSummary[]
   };
 }

@@ -317,7 +317,14 @@ export async function createAppointmentAction(
 
   revalidatePath("/professional/agenda");
 
-  return { message: "Cita programada.", ok: true };
+  return {
+    message: zoomMeeting?.joinUrl
+      ? `Cita programada. Link de videollamada creado: ${zoomMeeting.joinUrl}`
+      : parsed.data.type === "videollamada"
+        ? "Cita programada. No se creo link automatico de Zoom; recuerda crear tu liga de sesion."
+        : "Cita programada.",
+    ok: true
+  };
 }
 
 export async function cancelAppointmentAction(

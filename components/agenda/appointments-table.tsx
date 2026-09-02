@@ -66,7 +66,6 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
             <tr key={appointment.id} className="align-top">
               <td className="px-4 py-3">
                 <p className="font-medium text-ink">{appointment.patient.full_name}</p>
-                <p className="mt-1 text-xs text-ink/60">{appointment.patient.email}</p>
               </td>
               <td className="px-4 py-3 text-ink/70">
                 <Link href={`/professional/agenda/${appointment.id}`} className="font-medium text-azulMedio">
@@ -96,20 +95,20 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
                 {appointment.zoom_start_url ? (
                   <a
                     href={appointment.zoom_start_url}
-                    className="font-medium text-azulMedio"
+                    className="inline-flex min-h-9 items-center rounded-md bg-azulMedio px-3 text-xs font-bold text-blanco transition hover:bg-principal"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Iniciar
+                    Iniciar videollamada
                   </a>
                 ) : appointment.zoom_join_url ? (
                   <a
                     href={appointment.zoom_join_url}
-                    className="font-medium text-azulMedio"
+                    className="inline-flex min-h-9 items-center rounded-md border border-azulMedio px-3 text-xs font-bold text-azulMedio transition hover:bg-azulMedio hover:text-blanco"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Abrir enlace
+                    Abrir videollamada
                   </a>
                 ) : (
                   <span className="text-xs text-ink/55">Pendiente</span>

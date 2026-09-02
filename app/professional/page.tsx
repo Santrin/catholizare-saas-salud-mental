@@ -18,6 +18,11 @@ export default async function ProfessionalPage() {
   const firstName = profile.full_name.trim().split(" ")[0] || profile.full_name;
   const menuLinks = [
     {
+      label: "Pacientes",
+      href: "/professional/patients",
+      description: "Consulta rapidamente las personas a tu cargo."
+    },
+    {
       label: "Agenda",
       href: "/professional/agenda",
       description: "Organiza tus proximas citas y videollamadas."

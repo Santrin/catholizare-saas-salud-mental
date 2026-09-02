@@ -73,6 +73,11 @@ export function WeeklyAgenda({ appointments }: WeeklyAgendaProps) {
                     <span className="font-semibold">{formatTime(appointment.scheduled_at)}</span>
                     <span className="mt-1 block">{appointment.patient.full_name}</span>
                     <span className="mt-1 block text-ink/55">{appointment.type}</span>
+                    {appointment.type === "videollamada" ? (
+                      <span className="mt-2 block rounded bg-azulMedio px-2 py-1 text-center font-semibold text-blanco">
+                        Ver link de sesion
+                      </span>
+                    ) : null}
                   </Link>
                 ))}
                 {dayAppointments.length === 0 ? (
